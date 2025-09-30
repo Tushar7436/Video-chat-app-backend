@@ -5,7 +5,8 @@
         "no-console": {
             "severity": "Warning",
             "options": [ "debug","info","log","trace"]
-        }
+        },
+        "max-line-length": false 
     },
     "jsRules": {
         
