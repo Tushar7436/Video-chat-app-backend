@@ -5,23 +5,23 @@ import IRoomParams from "../interface/IRoomParams";
     /**
      * {{1: u1, u2, u3},{2: u4,u5,u6}}
      */
-    const rooms: Record<string, string[]> = {};
+const rooms: Record<string, string[]> = {};
 
 const roomHandler = (socket: Socket) => {
 
     const createRoom = () => {
         // this will be our uinque room id in which multiple connection will exchange data
-        const roomId = UUIDv4(); 
+        const roomId = UUIDv4();
 
         // we will make the socket connection enter a new room
-        socket.join(roomId); 
+        socket.join(roomId);
 
-        //create a new entry for the rooom
+        // create a new entry for the rooom
         rooms[roomId] = [];
 
         // we will emit an event fromserver side that socket connection has been added to a room
-        socket.emit("room-created", { roomId }); 
-        console.log("incoming request Room created", roomId);
+        socket.emit("room-created", { roomId });
+        console.log("sends response Room created", roomId);
     };
 
     /**
@@ -32,18 +32,25 @@ const roomHandler = (socket: Socket) => {
     const joinedRoom = ({ roomId, peerId }: IRoomParams) => {
         console.log("joined room called", rooms, roomId, peerId);
         if (rooms[roomId]) {
-            // If the given roomId exist in the in memory db 
+            // If the given roomId exist in the in memory db
             console.log("New user has joined the room", roomId, "with peerId as:", peerId);
             // the moment new user joins, add the peerId to the key of roomId
             rooms[roomId].push(peerId);
             console.log("added peer to room", rooms);
             socket.join(roomId); // make the user join the socket room
 
+            // whenever anyone joins the room
 
-            //below event is for logging purpose
-            socket.emit('get-user',{
+            socket.on("ready", () => {
+                // from the frontend once someone joins the room we will emit a ready event
+                // from our server to all the clients conn that a new peer has added to call
+                socket.to(roomId).emit("user-joined", {peerId});
+            });
+
+            // below event is for logging purpose
+            socket.emit("get-user", {
+                participants: rooms[roomId],
                 roomId,
-                participants: rooms[roomId]
             });
         }
     };
