@@ -3,7 +3,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { ExpressPeerServer } from "peer";
-import serverConfig from "../config/serverConfig";
+import serverConfig from "./config/serverConfig";
 import roomHandler from "./handlers/RoomHandler";
 
 const app = express();
